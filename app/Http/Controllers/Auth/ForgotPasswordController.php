@@ -18,7 +18,9 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    use SendsPasswordResetEmails;
+    use SendsPasswordResetEmails {
+        sendResetLinkEmail as traitSendResetLinkEmail;
+    }
 
     /**
      * Create a new controller instance.
@@ -28,5 +30,17 @@ class ForgotPasswordController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+    }
+
+    /**
+     * Send a reset link to the given user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $this->validate($request, ['g-recaptcha-response' => 'required|recaptcha']);
+        return $this->traitSendResetLinkEmail($request);
     }
 }
